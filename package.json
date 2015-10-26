@@ -9,11 +9,11 @@
     "url": "http://www.uniclau.com/"
   },
   "bugs": {
-    "url": "https://github.com/uniclau/jbPivot/issues"
+    "url": "https://github.com/htaox/jbPivot/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/uniclau/jbPivot.git"
+    "url": "https://github.com/htaox/jbPivot.git"
   },
   "keywords": [
     "pivot",
@@ -23,17 +23,27 @@
   ],
   "license": "GPL",
   "dependencies": {
-  	"jquery": "*",
-  	"jquery-ui": "*"
+    "jquery": "*",
+    "jquery-ui": "*"
   },
   "devDependencies": {
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-uglify": "~0.2.0",
-    "grunt-contrib-jshint": "^0.10.0",
-    "grunt": "~0.4.2"
+    "browserify": "^5.11.0",
+    "chai": "^1.9.1",
+    "gulp": "^3.8.7",
+    "gulp-concat": "^2.3.4",
+    "gulp-filter": "^1.0.0",
+    "gulp-jshint": "^1.8.4",
+    "gulp-minify-css": "^1.2.1",
+    "gulp-mocha": "^1.0.0",
+    "gulp-plumber": "^0.6.5",
+    "gulp-rename": "^1.2.2",
+    "gulp-watch": "^0.7.0",
+    "jshint-stylish": "^0.4.0",
+    "uglify-js": "^2.4.15",
+    "vinyl-map": "^1.0.1",
+    "vinyl-transform": "0.0.1"
   },
   "scripts": {
-    "build": "npm install && grunt",
-    "test": "grunt"
+    "test": "mocha **/*.spec.js --reporter spec"
   }
 }

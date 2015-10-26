@@ -61,6 +61,7 @@ $(function() {
          $(this.element).on('click', ".collapse_button", function(event) {
             event.preventDefault();
             self._togleCollapse(this.rel);
+            setTimeout(function() {$(".pivot").removeClass("pivot-hide");},100);
          });
 
          $(this.element).on('dragstart', '.draggable', function(event) {
@@ -307,6 +308,11 @@ $(function() {
          this._generate_trees();
 
          this._forceRender();
+
+         //force all nodes to collapse, then remove hide class
+         setTimeout(function(){ $('.collapse_button').trigger('click');
+          setTimeout(function(){ $(".pivot").removeClass("pivot-hide"); }, 100); },100);         
+         
       },
       insertRecords: function(records) {
          var i, f;
@@ -579,8 +585,9 @@ $(function() {
             }];
          this._tree2table("y", this.ytree, tabley);
 
+         var V;
          var S = "";
-
+/**
          S += "<table border='0px' cellspacing='0' cellpadding='0' class='unused_fields'><tr><th class='unused_field dropable targetU0' rel='U,0'>" + this.options.l_unused_fields + "</th>";
 
          for (i = 0; i < this.ufields.length; i++) {
@@ -597,9 +604,9 @@ $(function() {
             S += "</td></tr>";
          }
          S += "</table>";
+**/
 
-
-         S += "<table border=\"0px\" cellspacing=\"0\" cellpadding=\"0\" class=\"pivot\">";
+         S += "<table border=\"0px\" cellspacing=\"0\" cellpadding=\"0\" class=\"pivot pivot-hide\">";
 
 
 
@@ -874,7 +881,7 @@ $(function() {
                   mindex[this.yfields[i]] = tabley[x].index[i];
                }
 
-               var V = this._getValues(mindex);
+               V = this._getValues(mindex);
 
                for (z = 0; z < this.zfields.length; z++) {
                   S += "<td";
@@ -906,7 +913,8 @@ $(function() {
             S += "</tr>";
          }
          var totcol = 1 + this.xfields.length + tabley.length * this.zfields.length;
-         S += "<tr><td colspan='" + totcol;
+         S += "<tr class='pivot-hide'><td colspan='" + totcol;
+         
          cls = "";
          cls += " line_right_" + cmax;
          cls += " line_left_" + cmax;
@@ -915,7 +923,7 @@ $(function() {
          S += " class='" + cls + "'";
          S += ">";
 
-         S += "<tr>";
+         S += "<tr class='pivot-hide'>";
          for (i = 0; i < totcol; i++) {
             S += "<td ";
             cls = "bordermark";
@@ -927,7 +935,7 @@ $(function() {
          S += "</tr>";
 
          if (this.options.copyright) {
-            S += "<tr><td colspan='" + totcol + "'";
+            S += "<tr class='pivot-hide'><td colspan='" + totcol + "'";
             cls = "copyright";
 
             S += " class='" + cls + "'";
