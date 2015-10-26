@@ -1,425 +1,4 @@
 /*
-    Copyright 2013 Uniclau S.L. (www.uniclau.com)
-    
-    This file is part of jbPivot.
-
-    jbPivot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    jbPivot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with jbPivot.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-function agregate_average(options) {
-    "use strict";
-    var self = {};
-    self.options = $.extend({}, options);
-    self.agregate = function (a, b) {
-        var res;
-        if ((!a) || (a.type !== "agregate_average")) {
-            res = {
-                type: "agregate_average",
-                sum: 0,
-                count: 0
-            };
-        } else {
-            res = {
-                type: "agregate_average",
-                sum: a.sum,
-                count: a.count
-            };
-        }
-        if (b.type === "agregate_average") {
-            res.sum += b.sum;
-            res.count += b.count;
-        } else if (typeof b === "object") {
-            res.count++;
-            if (typeof b[this.options.field] === "number") {
-                res.sum += b[this.options.field];
-            } else if (typeof b[this.options.field] === "string") {
-                try {
-                    res.sum += parseInt(b[this.options.field], 10);
-                } catch (err) {
-
-                }
-            }
-        }
-        return res;
-    };
-
-    self.getValue = function (a) {
-        var res = null;
-        if ((a) && (a.type === "agregate_average") && (a.count > 0)) {
-            var v = a.sum / a.count;
-            res = v;
-        }
-        return res;
-    };
-    return self;
-}
-
-$.unc.plugins.addAgregate('average', agregate_average);
-/*
-    Copyright 2013 Uniclau S.L. (www.uniclau.com)
-    
-    This file is part of jbPivot.
-
-    jbPivot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    jbPivot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with jbPivot.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-function agregate_count() {
-    "use strict";
-    var self = {};
-    self.agregate = function (a, b) {
-        var res;
-        if ((!a) || (a.type !== "agregate_count")) {
-            res = {
-                type: "agregate_count",
-                count: 0
-            };
-        } else {
-            res = {
-                type: "agregate_count",
-                count: a.count
-            };
-        }
-        if (b.type === "agregate_count") {
-            res.count += b.count;
-        } else if (typeof b === "object") {
-            res.count++;
-        }
-        return res;
-    };
-
-    self.getValue = function (a) {
-        var res = null;
-        if ((a) && (a.type === "agregate_count")) {
-            res = a.count;
-        }
-        return res;
-    };
-    return self;
-}
-
-$.unc.plugins.addAgregate('count', agregate_count);
-/*
-    Copyright 2013 Uniclau S.L. (www.uniclau.com)
-    
-    This file is part of jbPivot.
-
-    jbPivot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    jbPivot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with jbPivot.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-function agregate_distinct(options) {
-    "use strict";
-    var self = {};
-    self.field = options.field;
-    self.agregate = function (a, b) {
-        var res = {
-            type: "fa_distinct"
-        };
-        if ((!a) || (a.type !== "fa_distinct")) {
-            res.repeated = false;
-            if (b.type === "fa_distinct") {
-                res.val = b.val;
-            } else if (typeof b === "object") {
-                res.repeated = false;
-                if ((typeof b[this.field] === "number") || (typeof b[this.field] === "string")) {
-                    res.val = b[this.field];
-                } else {
-                    res.val = null;
-                }
-            } else {
-                res.val = null;
-            }
-        } else {
-            if (b.type === "fa_distinct") {
-                res.repeated = (a.repeated || b.repeated || (a.val !== b.val));
-                res.val = a.val;
-            } else if (typeof b === "object") {
-                if ((typeof b[this.field] === "number") || (typeof b[this.field] === "string")) {
-                    res.repeated = (a.repeated || (a.val !== b[this.field]));
-                    res.val = a.val;
-                } else {
-                    res.repeated = (a.repeated || (a.val !== null));
-                    res.val = null;
-                }
-            } else {
-                res.repeated = (a.repeated || (a.val !== null));
-                res.val = null;
-            }
-        }
-
-        return res;
-    };
-
-    self.getValue = function (a) {
-        var res = null;
-        if ((a) && (a.type === "fa_distinct")) {
-            if (a.repeated) {
-                res = "*";
-            } else {
-                res = a.val;
-            }
-        }
-        return res;
-    };
-    return self;
-}
-
-$.unc.plugins.addAgregate('distinct', agregate_distinct);
-/*
-    Copyright 2013 Uniclau S.L. (www.uniclau.com)
-    
-    This file is part of jbPivot.
-
-    jbPivot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    jbPivot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with jbPivot.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-function agregate_sum(options) {
-    "use strict";
-    var self = {};
-    self.field = options.field;
-    self.agregate = function (a, b) {
-        var res;
-        if ((!a) || (a.type !== "agregate_sum")) {
-            res = {
-                type: "agregate_sum",
-                sum: 0
-            };
-        } else {
-            res = {
-                type: "agregate_sum",
-                sum: a.sum
-            };
-        }
-        if (b.type === "agregate_sum") {
-            res.sum += b.sum;
-        } else if (typeof b === "object") {
-            if (typeof b[this.field] === "number") {
-                res.sum += b[this.field];
-            } else if (typeof b[this.field] === "string") {
-                try {
-                    res.sum += parseInt(b[this.field],10);
-                } catch (err) {
-
-                }
-            }
-        }
-        return res;
-    };
-
-    self.getValue = function (a) {
-        var res = null;
-        if ((a) && (a.type === "agregate_sum")) {
-            res = a.sum;
-        }
-        return res;
-    };
-    return self;
-}
-
-$.unc.plugins.addAgregate('sum', agregate_sum);
-/*
-    Copyright 2013 Uniclau S.L. (www.uniclau.com)
-    
-    This file is part of jbPivot.
-
-    jbPivot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    jbPivot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with jbPivot.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-function formatter_default() {
-    "use strict";
-    var self = {};
-    self.format = function (value) {
-        var V = "";
-        try {
-            V = value.toString();
-        } catch (Error) {
-
-        }
-        return V;
-    };
-    return self;
-}
-
-$.unc.plugins.addFormatter('default', formatter_default);
-/*
-    Copyright 2013 Uniclau S.L. (www.uniclau.com)
-    
-    This file is part of jbPivot.
-
-    jbPivot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    jbPivot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with jbPivot.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-function grp_distinct(options) {
-    "use strict";
-    var self = {};
-    self.values = [];
-    self.names = {};
-    self.fieldtype = "number";
-    self.field = options.field;
-    if (typeof options.sort === "undefined") {
-        self.sort = "ASC";
-    } else {
-        self.sort = options.sort.toUpperCase();
-    }
-    if (typeof options.params !== "undefined") {
-        self.params = options.params;
-    } else {
-        self.params = null;
-    }
-    if (typeof options.showAll !== "undefined") {
-        self.showAll = options.showAll;
-    } else {
-        self.showAll = false;
-    }
-
-    self.CalculateValue = function (R) {
-        var V = "";
-        var res;
-        if (typeof R[this.field] === "function") {
-            V = R[this.field](this.params);
-        } else if (typeof R[this.field] === "number") {
-            V = R[this.field].toString();
-        } else if (typeof R[this.field] === "string") {
-            V = R[this.field];
-            this.fieldtype = "string";
-        }
-
-        if (typeof V !== "string") {
-            V = "";
-        }
-
-        if (typeof this.names[V] !== "undefined") {
-            res = this.names[V];
-        } else {
-            res = this.values.push(V) - 1;
-            this.names[V] = res;
-        }
-
-        return res;
-    };
-
-    self.getStringValue = function (idx) {
-        return this.values[idx];
-    };
-
-    self.DisplayValues = function (UsedValues) {
-        var res;
-        var i;
-
-        if (this.showAll) {
-            res = [];
-            for (i = 0; i < this.values.length; i++) {
-                res.push(i.toString());
-            }
-        } else {
-            res = UsedValues.slice(0);
-        }
-
-        var self = this;
-
-        if (this.fieldtype === "string") {
-            res = res.sort(function (a, b) {
-                var res = 0;
-                if (self.values[a] < self.values[b]) {
-                    res = -1;
-                }
-                if (self.values[a] > self.values[b]) {
-                    res = 1;
-                }
-                return res;
-            });
-        } else {
-            res = res.sort(function (a, b) {
-                var aa = parseFloat(self.values[a]);
-                var bb = parseFloat(self.values[b]);
-                var res = 0;
-                if (aa < bb) {
-                    res = -1;
-                }
-                if (aa > bb) {
-                    res = 1;
-                }
-                return res;
-            });
-        }
-
-        if (this.sort === "DESC") {
-            res = res.reverse();
-        }
-
-        return res;
-    };
-
-    return self;
-}
-
-$.unc.plugins.addGrouper('distinct', grp_distinct);
-/*
  Copyright 2013 Uniclau S.L. (www.uniclau.com)
 
  This file is part of jbPivot.
@@ -1287,7 +866,7 @@ $(function() {
 
          if ((this.options.summary) && (this.zfields.length > 0)) {
             S += "<tr>";
-            S += "<td colspan='" + (this.xfields.length + 1) + "'";
+            S += "<td colspan='" + (this.xfields.length + 1) + "' class='summary-left' ";
             S += " >";
             S += "</td>";
 
@@ -1599,3 +1178,424 @@ $(function() {
       }
    });
 });
+/*
+    Copyright 2013 Uniclau S.L. (www.uniclau.com)
+    
+    This file is part of jbPivot.
+
+    jbPivot is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    jbPivot is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with jbPivot.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function grp_distinct(options) {
+    "use strict";
+    var self = {};
+    self.values = [];
+    self.names = {};
+    self.fieldtype = "number";
+    self.field = options.field;
+    if (typeof options.sort === "undefined") {
+        self.sort = "ASC";
+    } else {
+        self.sort = options.sort.toUpperCase();
+    }
+    if (typeof options.params !== "undefined") {
+        self.params = options.params;
+    } else {
+        self.params = null;
+    }
+    if (typeof options.showAll !== "undefined") {
+        self.showAll = options.showAll;
+    } else {
+        self.showAll = false;
+    }
+
+    self.CalculateValue = function (R) {
+        var V = "";
+        var res;
+        if (typeof R[this.field] === "function") {
+            V = R[this.field](this.params);
+        } else if (typeof R[this.field] === "number") {
+            V = R[this.field].toString();
+        } else if (typeof R[this.field] === "string") {
+            V = R[this.field];
+            this.fieldtype = "string";
+        }
+
+        if (typeof V !== "string") {
+            V = "";
+        }
+
+        if (typeof this.names[V] !== "undefined") {
+            res = this.names[V];
+        } else {
+            res = this.values.push(V) - 1;
+            this.names[V] = res;
+        }
+
+        return res;
+    };
+
+    self.getStringValue = function (idx) {
+        return this.values[idx];
+    };
+
+    self.DisplayValues = function (UsedValues) {
+        var res;
+        var i;
+
+        if (this.showAll) {
+            res = [];
+            for (i = 0; i < this.values.length; i++) {
+                res.push(i.toString());
+            }
+        } else {
+            res = UsedValues.slice(0);
+        }
+
+        var self = this;
+
+        if (this.fieldtype === "string") {
+            res = res.sort(function (a, b) {
+                var res = 0;
+                if (self.values[a] < self.values[b]) {
+                    res = -1;
+                }
+                if (self.values[a] > self.values[b]) {
+                    res = 1;
+                }
+                return res;
+            });
+        } else {
+            res = res.sort(function (a, b) {
+                var aa = parseFloat(self.values[a]);
+                var bb = parseFloat(self.values[b]);
+                var res = 0;
+                if (aa < bb) {
+                    res = -1;
+                }
+                if (aa > bb) {
+                    res = 1;
+                }
+                return res;
+            });
+        }
+
+        if (this.sort === "DESC") {
+            res = res.reverse();
+        }
+
+        return res;
+    };
+
+    return self;
+}
+
+$.unc.plugins.addGrouper('distinct', grp_distinct);
+/*
+    Copyright 2013 Uniclau S.L. (www.uniclau.com)
+    
+    This file is part of jbPivot.
+
+    jbPivot is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    jbPivot is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with jbPivot.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function agregate_average(options) {
+    "use strict";
+    var self = {};
+    self.options = $.extend({}, options);
+    self.agregate = function (a, b) {
+        var res;
+        if ((!a) || (a.type !== "agregate_average")) {
+            res = {
+                type: "agregate_average",
+                sum: 0,
+                count: 0
+            };
+        } else {
+            res = {
+                type: "agregate_average",
+                sum: a.sum,
+                count: a.count
+            };
+        }
+        if (b.type === "agregate_average") {
+            res.sum += b.sum;
+            res.count += b.count;
+        } else if (typeof b === "object") {
+            res.count++;
+            if (typeof b[this.options.field] === "number") {
+                res.sum += b[this.options.field];
+            } else if (typeof b[this.options.field] === "string") {
+                try {
+                    res.sum += parseInt(b[this.options.field], 10);
+                } catch (err) {
+
+                }
+            }
+        }
+        return res;
+    };
+
+    self.getValue = function (a) {
+        var res = null;
+        if ((a) && (a.type === "agregate_average") && (a.count > 0)) {
+            var v = a.sum / a.count;
+            res = v;
+        }
+        return res;
+    };
+    return self;
+}
+
+$.unc.plugins.addAgregate('average', agregate_average);
+/*
+    Copyright 2013 Uniclau S.L. (www.uniclau.com)
+    
+    This file is part of jbPivot.
+
+    jbPivot is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    jbPivot is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with jbPivot.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function agregate_count() {
+    "use strict";
+    var self = {};
+    self.agregate = function (a, b) {
+        var res;
+        if ((!a) || (a.type !== "agregate_count")) {
+            res = {
+                type: "agregate_count",
+                count: 0
+            };
+        } else {
+            res = {
+                type: "agregate_count",
+                count: a.count
+            };
+        }
+        if (b.type === "agregate_count") {
+            res.count += b.count;
+        } else if (typeof b === "object") {
+            res.count++;
+        }
+        return res;
+    };
+
+    self.getValue = function (a) {
+        var res = null;
+        if ((a) && (a.type === "agregate_count")) {
+            res = a.count;
+        }
+        return res;
+    };
+    return self;
+}
+
+$.unc.plugins.addAgregate('count', agregate_count);
+/*
+    Copyright 2013 Uniclau S.L. (www.uniclau.com)
+    
+    This file is part of jbPivot.
+
+    jbPivot is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    jbPivot is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with jbPivot.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function agregate_distinct(options) {
+    "use strict";
+    var self = {};
+    self.field = options.field;
+    self.agregate = function (a, b) {
+        var res = {
+            type: "fa_distinct"
+        };
+        if ((!a) || (a.type !== "fa_distinct")) {
+            res.repeated = false;
+            if (b.type === "fa_distinct") {
+                res.val = b.val;
+            } else if (typeof b === "object") {
+                res.repeated = false;
+                if ((typeof b[this.field] === "number") || (typeof b[this.field] === "string")) {
+                    res.val = b[this.field];
+                } else {
+                    res.val = null;
+                }
+            } else {
+                res.val = null;
+            }
+        } else {
+            if (b.type === "fa_distinct") {
+                res.repeated = (a.repeated || b.repeated || (a.val !== b.val));
+                res.val = a.val;
+            } else if (typeof b === "object") {
+                if ((typeof b[this.field] === "number") || (typeof b[this.field] === "string")) {
+                    res.repeated = (a.repeated || (a.val !== b[this.field]));
+                    res.val = a.val;
+                } else {
+                    res.repeated = (a.repeated || (a.val !== null));
+                    res.val = null;
+                }
+            } else {
+                res.repeated = (a.repeated || (a.val !== null));
+                res.val = null;
+            }
+        }
+
+        return res;
+    };
+
+    self.getValue = function (a) {
+        var res = null;
+        if ((a) && (a.type === "fa_distinct")) {
+            if (a.repeated) {
+                res = "*";
+            } else {
+                res = a.val;
+            }
+        }
+        return res;
+    };
+    return self;
+}
+
+$.unc.plugins.addAgregate('distinct', agregate_distinct);
+/*
+    Copyright 2013 Uniclau S.L. (www.uniclau.com)
+    
+    This file is part of jbPivot.
+
+    jbPivot is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    jbPivot is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with jbPivot.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function agregate_sum(options) {
+    "use strict";
+    var self = {};
+    self.field = options.field;
+    self.agregate = function (a, b) {
+        var res;
+        if ((!a) || (a.type !== "agregate_sum")) {
+            res = {
+                type: "agregate_sum",
+                sum: 0
+            };
+        } else {
+            res = {
+                type: "agregate_sum",
+                sum: a.sum
+            };
+        }
+        if (b.type === "agregate_sum") {
+            res.sum += b.sum;
+        } else if (typeof b === "object") {
+            if (typeof b[this.field] === "number") {
+                res.sum += b[this.field];
+            } else if (typeof b[this.field] === "string") {
+                try {
+                    res.sum += parseInt(b[this.field],10);
+                } catch (err) {
+
+                }
+            }
+        }
+        return res;
+    };
+
+    self.getValue = function (a) {
+        var res = null;
+        if ((a) && (a.type === "agregate_sum")) {
+            res = a.sum;
+        }
+        return res;
+    };
+    return self;
+}
+
+$.unc.plugins.addAgregate('sum', agregate_sum);
+/*
+    Copyright 2013 Uniclau S.L. (www.uniclau.com)
+    
+    This file is part of jbPivot.
+
+    jbPivot is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    jbPivot is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with jbPivot.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+function formatter_default() {
+    "use strict";
+    var self = {};
+    self.format = function (value) {
+        var V = "";
+        try {
+            V = value.toString();
+        } catch (Error) {
+
+        }
+        return V;
+    };
+    return self;
+}
+
+$.unc.plugins.addFormatter('default', formatter_default);

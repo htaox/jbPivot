@@ -866,7 +866,7 @@ $(function() {
 
          if ((this.options.summary) && (this.zfields.length > 0)) {
             S += "<tr>";
-            S += "<td colspan='" + (this.xfields.length + 1) + "'";
+            S += "<td colspan='" + (this.xfields.length + 1) + "' class='summary-left' ";
             S += " >";
             S += "</td>";
 

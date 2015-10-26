@@ -148,7 +148,7 @@ gulp.task('concat-css', function() {
 });
 
 gulp.task('concat-js', function() {
-  return gulp.src('src/**/*.js')
+  return gulp.src(['src/pivot.js', 'src/group*.js', 'src/agregate*.js', 'src/formatter*.js'])
     .pipe(concat('jbPivot.js'))
     .pipe(gulp.dest('build'));
 });
